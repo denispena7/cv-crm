@@ -22,7 +22,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "experiencias", schema = "cv-crm")
+@Table(name = "experiencias", schema = "cv_crm")
 public class Experiencia 
 {
     @Id

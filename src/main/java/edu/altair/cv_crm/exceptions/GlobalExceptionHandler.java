@@ -12,17 +12,32 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
 	// Manejo de Error 404 - Recurso no encontrado
-		 @ExceptionHandler(UserNotFoundException.class)
-		 public ProblemDetail manejarEntityNoEncontrado(UserNotFoundException ex) {
-			 
-			 ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-				 HttpStatus.NOT_FOUND,
-				 ex.getMessage()
-			 );
-			 
-			 problem.setTitle("Usuario No Encontrado");
-			 problem.setType(URI.create("https://api.crm.altair.edu/errors/not-found"));
-			 problem.setProperty("timestamp", Instant.now());
-			 return problem;
-		 }
+	 @ExceptionHandler(UserNotFoundException.class)
+	 public ProblemDetail manejarEntityNoEncontrado(UserNotFoundException ex) {
+		 
+		 ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+			 HttpStatus.NOT_FOUND,
+			 ex.getMessage()
+		 );
+		 
+		 problem.setTitle("Usuario No Encontrado");
+		 problem.setType(URI.create("https://api.crm.altair.edu/errors/not-found"));
+		 problem.setProperty("timestamp", Instant.now());
+		 return problem;
+	 }
+	 
+	 // Manejo de Error 409: Conflicto de duplicidad de propiedad
+	 @ExceptionHandler(PropertyAlreadyExistsException.class)
+	 public ProblemDetail manejarCodigoDuplicado(PropertyAlreadyExistsException ex) 
+	 {
+		 ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+			 HttpStatus.CONFLICT,
+			 ex.getMessage()
+		 );
+		 
+		 problem.setTitle("Conflicto de Datos");
+		 problem.setType(URI.create("https://api.crm.altair.edu/errors/conflict"));
+		 problem.setProperty("timestamp", Instant.now());
+		 return problem;
+	 }
 }

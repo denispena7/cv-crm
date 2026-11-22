@@ -17,7 +17,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "alumnos", schema = "cv-crm", uniqueConstraints = {
+@Table(name = "alumnos", schema = "cv_crm", uniqueConstraints = {
         @UniqueConstraint(name = "uk_alumnos_dniAlumno", columnNames = "dniAlumno"),
         @UniqueConstraint(name = "uk_alumnos_numeroSS", columnNames = "numeroSS")
 })

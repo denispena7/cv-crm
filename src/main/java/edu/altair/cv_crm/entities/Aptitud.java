@@ -20,7 +20,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "aptitudes", schema = "cv-crm")
+@Table(name = "aptitudes", schema = "cv_crm")
 public class Aptitud 
 {
     @Id
