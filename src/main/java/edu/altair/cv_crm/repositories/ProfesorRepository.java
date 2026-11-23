@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import edu.altair.cv_crm.entities.Profesor;
 
 @Repository
-public interface ProfesorRepository extends JpaRepository<Profesor, Long> {
-
+public interface ProfesorRepository extends JpaRepository<Profesor, Long>
+{
+	boolean existsByDni(String dni);
 }
