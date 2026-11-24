@@ -12,6 +12,8 @@ import edu.altair.cv_crm.entities.Idioma;
 public interface IdiomaMapper
 {
 	@Mapping(source = "idIdioma", target = "id")
+    @Mapping(source = "alumno.idAlumno", target = "idAlumno")
+    @Mapping(source = "profesor.idProfesor", target = "idProfesor")
 	IdiomaResponseDto toIdiomaResponseDto(Idioma idioma);
 	
 	@Mapping(target = "idIdioma", ignore = true)

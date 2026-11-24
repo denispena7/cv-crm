@@ -7,9 +7,10 @@ import edu.altair.cv_crm.dtos.responses.AptitudResponseDto;
 
 public interface AptitudService
 {
-    List<AptitudResponseDto> obtenerTodas();
-    AptitudResponseDto obtenerPorId(Long id);
-    AptitudResponseDto crear(AptitudRequestDto requestDto);
+    List<AptitudResponseDto> obtenerParaAlumno(Long idAlumno);
+    List<AptitudResponseDto> obtenerParaProfesor(Long idProfesor);
+    AptitudResponseDto crearParaAlumno(Long idAlumno, AptitudRequestDto requestDto);
+    AptitudResponseDto crearParaProfesor(Long idProfesor, AptitudRequestDto requestDto);
     AptitudResponseDto actualizar(Long id, AptitudRequestDto requestDto);
     void eliminar(Long id);
 }

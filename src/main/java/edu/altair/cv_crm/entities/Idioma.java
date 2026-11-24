@@ -34,7 +34,7 @@ public class Idioma
     @Column(name = "nivel", nullable = false, length = 5)
     private String nivel;
 
-    @Column(name = "institucionExpide", nullable = false, length = 9)
+    @Column(name = "institucionExpide")
     private String institucionExpide;
     
     @ManyToOne(fetch = FetchType.LAZY)

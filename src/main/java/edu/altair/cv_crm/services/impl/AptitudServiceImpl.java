@@ -7,10 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.altair.cv_crm.dtos.requests.AptitudRequestDto;
 import edu.altair.cv_crm.dtos.responses.AptitudResponseDto;
+import edu.altair.cv_crm.entities.Alumno;
 import edu.altair.cv_crm.entities.Aptitud;
+import edu.altair.cv_crm.entities.Profesor;
 import edu.altair.cv_crm.exceptions.UserNotFoundException;
 import edu.altair.cv_crm.mappers.AptitudMapper;
+import edu.altair.cv_crm.repositories.AlumnoRepository;
 import edu.altair.cv_crm.repositories.AptitudRepository;
+import edu.altair.cv_crm.repositories.ProfesorRepository;
 import edu.altair.cv_crm.services.AptitudService;
 import lombok.RequiredArgsConstructor;
 
@@ -19,13 +23,15 @@ import lombok.RequiredArgsConstructor;
 public class AptitudServiceImpl implements AptitudService 
 {
 	private final AptitudRepository aptRepo;
+	private final ProfesorRepository profesorRepo;
+	private final AlumnoRepository alumnoRepo;
 	private final AptitudMapper mapper;
-
+	
 	@Override
 	@Transactional(readOnly = true)
-	public List<AptitudResponseDto> obtenerTodas() 
+	public List<AptitudResponseDto> obtenerParaAlumno(Long idAlumno)
 	{
-		return aptRepo.findAll()
+		return aptRepo.findByAlumno_IdAlumno(idAlumno)
 	               .stream()
 	               .map(mapper::toAptitudResponseDto)
 	               .toList();
@@ -33,23 +39,46 @@ public class AptitudServiceImpl implements AptitudService
 
 	@Override
 	@Transactional(readOnly = true)
-	public AptitudResponseDto obtenerPorId(Long id) 
+	public List<AptitudResponseDto> obtenerParaProfesor(Long idProfesor)
 	{
-	    return aptRepo.findById(id)
-	            .map(mapper::toAptitudResponseDto)
-	            .orElseThrow(() ->
-	                new UserNotFoundException("Aptitud no encontrada con el ID: " + id));
+		return aptRepo.findByProfesor_IdProfesor(idProfesor)
+	               .stream()
+	               .map(mapper::toAptitudResponseDto)
+	               .toList();
 	}
 
 	@Override
 	@Transactional
-	public AptitudResponseDto crear(AptitudRequestDto dto)
+	public AptitudResponseDto crearParaAlumno(Long idAlumno, AptitudRequestDto requestDto)
 	{
-       Aptitud aptEntity = mapper.toAptitudEnt(dto);
+        Alumno alumno = alumnoRepo.findById(idAlumno)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Alumno no encontrado con el ID: " + idAlumno));
 
-       Aptitud guardado = aptRepo.save(aptEntity);
+        Aptitud aptitud = mapper.toAptitudEnt(requestDto);
 
-       return mapper.toAptitudResponseDto(guardado);
+        aptitud.setAlumno(alumno);
+
+        Aptitud guardado = aptRepo.save(aptitud);
+
+        return mapper.toAptitudResponseDto(guardado);
+	}
+
+	@Override
+	@Transactional
+	public AptitudResponseDto crearParaProfesor(Long idProfesor, AptitudRequestDto requestDto)
+	{
+        Profesor profesor = profesorRepo.findById(idProfesor)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Profesor no encontrado con el ID: " + idProfesor));
+
+        Aptitud aptitud = mapper.toAptitudEnt(requestDto);
+
+        aptitud.setProfesor(profesor);
+
+        Aptitud guardado = aptRepo.save(aptitud);
+
+        return mapper.toAptitudResponseDto(guardado);
 	}
 
 	@Override

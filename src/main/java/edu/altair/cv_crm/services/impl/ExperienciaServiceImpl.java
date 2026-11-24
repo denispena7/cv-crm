@@ -7,10 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.altair.cv_crm.dtos.requests.ExperienciaRequestDto;
 import edu.altair.cv_crm.dtos.responses.ExperienciaResponseDto;
+import edu.altair.cv_crm.entities.Alumno;
 import edu.altair.cv_crm.entities.Experiencia;
+import edu.altair.cv_crm.entities.Profesor;
 import edu.altair.cv_crm.exceptions.UserNotFoundException;
 import edu.altair.cv_crm.mappers.ExperienciaMapper;
+import edu.altair.cv_crm.repositories.AlumnoRepository;
 import edu.altair.cv_crm.repositories.ExperienciaRepository;
+import edu.altair.cv_crm.repositories.ProfesorRepository;
 import edu.altair.cv_crm.services.ExperienciaService;
 import lombok.RequiredArgsConstructor;
 
@@ -19,13 +23,15 @@ import lombok.RequiredArgsConstructor;
 public class ExperienciaServiceImpl implements ExperienciaService 
 {
 	private final ExperienciaRepository expRepo;
+	private final ProfesorRepository profesorRepo;
+	private final AlumnoRepository alumnoRepo;
 	private final ExperienciaMapper mapper;
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<ExperienciaResponseDto> obtenerTodas() 
+	public List<ExperienciaResponseDto> obtenerParaAlumno(Long idAlumno)
 	{
-		return expRepo.findAll()
+		return expRepo.findByAlumno_IdAlumno(idAlumno)
 	               .stream()
 	               .map(mapper::toExperienciaResponseDto)
 	               .toList();
@@ -33,23 +39,46 @@ public class ExperienciaServiceImpl implements ExperienciaService
 
 	@Override
 	@Transactional(readOnly = true)
-	public ExperienciaResponseDto obtenerPorId(Long id)
+	public List<ExperienciaResponseDto> obtenerParaProfesor(Long idProfesor)
 	{
-	    return expRepo.findById(id)
-	            .map(mapper::toExperienciaResponseDto)
-	            .orElseThrow(() ->
-	                new UserNotFoundException("Experiencia no encontrado con el ID: " + id));
+		return expRepo.findByProfesor_IdProfesor(idProfesor)
+	               .stream()
+	               .map(mapper::toExperienciaResponseDto)
+	               .toList();
 	}
 
 	@Override
 	@Transactional
-	public ExperienciaResponseDto crear(ExperienciaRequestDto dto)
+	public ExperienciaResponseDto crearParaAlumno(Long idAlumno, ExperienciaRequestDto requestDto)
 	{
-	       Experiencia expEntity = mapper.toExperienciaEnt(dto);
-	
-	       Experiencia guardado = expRepo.save(expEntity);
-	
-	       return mapper.toExperienciaResponseDto(guardado);
+        Alumno alumno = alumnoRepo.findById(idAlumno)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Alumno no encontrado con el ID: " + idAlumno));
+
+        Experiencia experiencia = mapper.toExperienciaEnt(requestDto);
+
+        experiencia.setAlumno(alumno);
+
+        Experiencia guardado = expRepo.save(experiencia);
+
+        return mapper.toExperienciaResponseDto(guardado);
+	}
+
+	@Override
+	@Transactional
+	public ExperienciaResponseDto crearParaProfesor(Long idProfesor, ExperienciaRequestDto requestDto)
+	{
+        Profesor profesor = profesorRepo.findById(idProfesor)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Profesor no encontrado con el ID: " + idProfesor));
+
+        Experiencia experiencia = mapper.toExperienciaEnt(requestDto);
+
+        experiencia.setProfesor(profesor);
+
+        Experiencia guardado = expRepo.save(experiencia);
+
+        return mapper.toExperienciaResponseDto(guardado);
 	}
 
 	@Override
@@ -80,5 +109,4 @@ public class ExperienciaServiceImpl implements ExperienciaService
        expRepo.deleteById(id);
 
 	}
-
 }

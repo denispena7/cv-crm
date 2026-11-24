@@ -12,6 +12,8 @@ import edu.altair.cv_crm.entities.Experiencia;
 public interface ExperienciaMapper
 {
 	@Mapping(source = "idExperiencia", target = "id")
+    @Mapping(source = "alumno.idAlumno", target = "idAlumno")
+    @Mapping(source = "profesor.idProfesor", target = "idProfesor")
 	ExperienciaResponseDto toExperienciaResponseDto(Experiencia experiencia);
 	
 	@Mapping(target = "idExperiencia", ignore = true)

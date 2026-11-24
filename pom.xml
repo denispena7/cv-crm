@@ -28,6 +28,10 @@
 	</scm>
 	<properties>
 		<java.version>25</java.version>
+		<org.mapstruct.version>1.6.3</org.mapstruct.version>
+
+	    <!-- Activar procesamiento automático de anotaciones en Eclipse -->
+	    <m2e.apt.activation>jdt_apt</m2e.apt.activation>
 	</properties>
 	<dependencies>
 		<dependency>

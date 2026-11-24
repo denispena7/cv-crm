@@ -12,11 +12,16 @@ import edu.altair.cv_crm.entities.Formacion;
 public interface FormacionMapper 
 {
 	@Mapping(source = "idFormacion", target = "id")
+	@Mapping(source = "nombreCentro", target = "centro")
+    @Mapping(source = "alumno.idAlumno", target = "idAlumno")
+    @Mapping(source = "profesor.idProfesor", target = "idProfesor")
 	FormacionResponseDto toFormacionResponseDto(Formacion formacion);
 	
 	@Mapping(target = "idFormacion", ignore = true)
+	 @Mapping(source = "centro", target = "nombreCentro")
 	Formacion toFormacionEnt(FormacionRequestDto formacionDto);
 	
+	 @Mapping(source = "centro", target = "nombreCentro")
 	@Mapping(target = "idFormacion", ignore = true)
 	void updateFormacionFromDto(FormacionRequestDto dto, @MappingTarget Formacion formacion);
 }

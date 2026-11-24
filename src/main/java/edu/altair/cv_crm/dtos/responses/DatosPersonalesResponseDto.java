@@ -4,8 +4,8 @@ public record DatosPersonalesResponseDto(
 		Long id,
 	    String nombre,
 	    String apellidos,
-	    String telefono,
-	    String email,
+	    String telefono_personal,
+	    String email_personal,
 	    String cargo,
 	    String descripcion
 ) {}

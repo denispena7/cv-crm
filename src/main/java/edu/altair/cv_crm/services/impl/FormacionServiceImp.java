@@ -7,10 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.altair.cv_crm.dtos.requests.FormacionRequestDto;
 import edu.altair.cv_crm.dtos.responses.FormacionResponseDto;
+import edu.altair.cv_crm.entities.Alumno;
 import edu.altair.cv_crm.entities.Formacion;
+import edu.altair.cv_crm.entities.Profesor;
 import edu.altair.cv_crm.exceptions.UserNotFoundException;
 import edu.altair.cv_crm.mappers.FormacionMapper;
+import edu.altair.cv_crm.repositories.AlumnoRepository;
 import edu.altair.cv_crm.repositories.FormacionRepository;
+import edu.altair.cv_crm.repositories.ProfesorRepository;
 import edu.altair.cv_crm.services.FormacionService;
 import lombok.RequiredArgsConstructor;
 
@@ -19,13 +23,15 @@ import lombok.RequiredArgsConstructor;
 public class FormacionServiceImp implements FormacionService 
 {
 	private final FormacionRepository formRepo;
+	private final ProfesorRepository profesorRepo;
+	private final AlumnoRepository alumnoRepo;
 	private final FormacionMapper mapper;
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<FormacionResponseDto> obtenerTodas()
+	public List<FormacionResponseDto> obtenerParaAlumno(Long idAlumno)
 	{
-		return formRepo.findAll()
+		return formRepo.findByAlumno_IdAlumno(idAlumno)
 	               .stream()
 	               .map(mapper::toFormacionResponseDto)
 	               .toList();
@@ -33,23 +39,46 @@ public class FormacionServiceImp implements FormacionService
 
 	@Override
 	@Transactional(readOnly = true)
-	public FormacionResponseDto obtenerPorId(Long id)
+	public List<FormacionResponseDto> obtenerParaProfesor(Long idProfesor)
 	{
-	    return formRepo.findById(id)
-	            .map(mapper::toFormacionResponseDto)
-	            .orElseThrow(() ->
-	                new UserNotFoundException("Formacion no encontrada con el ID: " + id));
+		return formRepo.findByProfesor_IdProfesor(idProfesor)
+	               .stream()
+	               .map(mapper::toFormacionResponseDto)
+	               .toList();
 	}
 
 	@Override
 	@Transactional
-	public FormacionResponseDto crear(FormacionRequestDto dto)
+	public FormacionResponseDto crearParaAlumno(Long idAlumno, FormacionRequestDto requestDto)
 	{
-	       Formacion formEntity = mapper.toFormacionEnt(dto);
+        Alumno alumno = alumnoRepo.findById(idAlumno)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Alumno no encontrado con el ID: " + idAlumno));
 
-	       Formacion guardado = formRepo.save(formEntity);
+        Formacion formacion = mapper.toFormacionEnt(requestDto);
 
-	       return mapper.toFormacionResponseDto(guardado);
+        formacion.setAlumno(alumno);
+
+        Formacion guardado = formRepo.save(formacion);
+
+        return mapper.toFormacionResponseDto(guardado);
+	}
+
+	@Override
+	@Transactional
+	public FormacionResponseDto crearParaProfesor(Long idProfesor, FormacionRequestDto requestDto)
+	{
+        Profesor profesor = profesorRepo.findById(idProfesor)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Profesor no encontrado con el ID: " + idProfesor));
+
+        Formacion formacion = mapper.toFormacionEnt(requestDto);
+
+        formacion.setProfesor(profesor);
+
+        Formacion guardado = formRepo.save(formacion);
+
+        return mapper.toFormacionResponseDto(guardado);
 	}
 
 	@Override
@@ -74,7 +103,7 @@ public class FormacionServiceImp implements FormacionService
 	{
        if (!formRepo.existsById(id)) {
            throw new UserNotFoundException(
-                   "Imposible eliminar. Aptitud no encontrado con el ID: " + id);
+                   "Imposible eliminar. Formación no encontrado con el ID: " + id);
        }
 
        formRepo.deleteById(id);
